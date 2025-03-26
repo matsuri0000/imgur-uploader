@@ -78,13 +78,18 @@
           const url = data.data.link;
 
           // ✅ スプレッドシートに送信
-          fetch(GAS_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              url: url,
-              caption: "" // ← 必要ならあとで拡張可能
-            })
+        fetch(GAS_URL, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    url: url,
+    caption: ""
+  }),
+  mode: 'cors' // ←これが必要！
+});
+
           });
 
           return url;
