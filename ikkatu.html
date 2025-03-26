@@ -19,8 +19,8 @@
   <div id="result"></div>
 
   <script>
-    const clientId = "5789fe0d123c0fe";
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbx5wZroDRgFHWBsHQdEHAhHsK6jX-tTipUtj1rb6QG8J2MME6yUBU_Phls7B5Gw-2aR/exec"; // ← あなたのGASのURLに
+    const clientId = "5789fe0d123c0fe";  // ← あなたのImgur Client ID
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbx5wZroDRgFHWBsHQdEHAhHsK6jX-tTipUtj1rb6QG8J2MME6yUBU_Phls7B5Gw-2aR/exec"; // ← あなたのGAS Web App URL
 
     function resizeToSquare(file) {
       return new Promise((resolve) => {
@@ -77,15 +77,15 @@
         if (data.success) {
           const url = data.data.link;
 
-          // ✅ スプレッドシートに送信
+          // ✅ GASに送信
           fetch(GAS_URL, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/json'
             },
             body: JSON.stringify({
               url: url,
-              caption: ""
+              caption: "" // キャプション送るならここに追加
             }),
             mode: 'cors'
           });
