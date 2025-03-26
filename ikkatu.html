@@ -20,7 +20,7 @@
 
   <script>
     const clientId = "5789fe0d123c0fe";
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbx5wZroDRgFHWBsHQdEHAhHsK6jX-tTipUtj1rb6QG8J2MME6yUBU_Phls7B5Gw-2aR/exec"; // ← ← ← あなたのURLに置き換えて！
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbx5wZroDRgFHWBsHQdEHAhHsK6jX-tTipUtj1rb6QG8J2MME6yUBU_Phls7B5Gw-2aR/exec"; // ← あなたのGASのURLに
 
     function resizeToSquare(file) {
       return new Promise((resolve) => {
@@ -78,18 +78,16 @@
           const url = data.data.link;
 
           // ✅ スプレッドシートに送信
-        fetch(GAS_URL, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    url: url,
-    caption: ""
-  }),
-  mode: 'cors' // ←これが必要！
-});
-
+          fetch(GAS_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              url: url,
+              caption: ""
+            }),
+            mode: 'cors'
           });
 
           return url;
