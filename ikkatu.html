@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Instagram正方形アップローダー（複数対応＋スプレッドシート連携）</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; }
+    .url-box { margin: 0.5em 0; padding: 0.5em; border: 1px solid #ccc; }
+    input.url-input { width: 90%; }
+  </style>
+</head>
+<body>
+  <h2>📤 Instagram用 正方形画像アップローダー</h2>
+  <p>※すべての画像が自動で <strong>1080×1080px</strong> に変換され、Imgurへアップロード後、スプレッドシートにURLを送信します</p>
+
+  <input type="file" id="imageInput" multiple accept="image/*">
+  <button onclick="uploadImages()">アップロード</button>
+
+  <div id="result"></div>
+
+  <script>
+    const clientId = "5789fe0d123c0fe";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbx5wZroDRgFHWBsHQdEHAhHsK6jX-tTipUtj1rb6QG8J2MME6yUBU_Phls7B5Gw-2aR/exec"; // ← ← ← あなたのURLに置き換えて！
+
+    function resizeToSquare(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = new Image();
+          img.onload = function () {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const size = 1080;
+            canvas.width = size;
+            canvas.height = size;
+
+            const short = Math.min(img.width, img.height);
+            const sx = (img.width - short) / 2;
+            const sy = (img.height - short) / 2;
+
+            ctx.drawImage(img, sx, sy, short, short, 0, 0, size, size);
+            const base64 = canvas.toDataURL("image/jpeg");
+            resolve(base64);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadImages() {
+      const input = document.getElementById("imageInput");
+      const files = input.files;
+      const result = document.getElementById("result");
+      result.innerHTML = "";
+
+      if (!files.length) {
+        alert("画像を選んでください");
+        return;
+      }
+
+      const uploads = Array.from(files).map(async (file) => {
+        const resized = await resizeToSquare(file);
+        const base64 = resized.split(",")[1];
+
+        const res = await fetch("https://api.imgur.com/3/image", {
+          method: "POST",
+          headers: {
+            Authorization: "Client-ID " + clientId,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ image: base64, type: "base64" }),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          const url = data.data.link;
+
+          // ✅ スプレッドシートに送信
+          fetch(GAS_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              url: url,
+              caption: "" // ← 必要ならあとで拡張可能
+            })
+          });
+
+          return url;
+        } else {
+          return `エラー: ${data.data.error}`;
+        }
+      });
+
+      const urls = await Promise.all(uploads);
+
+      urls.forEach((url) => {
+        const box = document.createElement("div");
+        box.className = "url-box";
+        box.innerHTML = `<strong>URL:</strong> <input class="url-input" type="text" value="${url}" readonly>`;
+        result.appendChild(box);
+      });
+    }
+  </script>
+</body>
+</html>
