@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Instagram正方形アップローダー（複数対応＋スプレッドシート連携）</title>
+  <title>Instagram正方形アップローダー</title>
   <style>
     body { font-family: sans-serif; padding: 2em; }
     .url-box { margin: 0.5em 0; padding: 0.5em; border: 1px solid #ccc; }
@@ -20,7 +20,7 @@
 
   <script>
     const clientId = "5789fe0d123c0fe";
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbx5wZroDRgFHWBsHQdEHAhHsK6jX-tTipUtj1rb6QG8J2MME6yUBU_Phls7B5Gw-2aR/exec"; // あなたのGAS URLに置き換え済み
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbx5wZroDRgFHWBsHQdEHAhHsK6jX-tTipUtj1rb6QG8J2MME6yUBU_Phls7B5Gw-2aR/exec"; // あなたのURL
 
     function resizeToSquare(file) {
       return new Promise((resolve) => {
@@ -77,16 +77,11 @@
         if (data.success) {
           const url = data.data.link;
 
-          // ✅ GASへ送信
+          // ✅ GASに送信
           fetch(GAS_URL, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              url: url,
-              caption: "" // キャプション追加する場合はここに
-            }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: url, caption: "" }),
             mode: 'cors'
           });
 
